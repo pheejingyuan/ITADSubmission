@@ -19,8 +19,9 @@ void setup()
 void loop()
 {
 /*
-this loop will actively listen for RFID tag and when a RFID tag is in range,
-it will go through an if else to check on which clothing matches the one that they are currently holding. 
+NAME = YiLin
+PURPOSE = To read the rfid tag number and to tell the user what is the trending clothes that matches it
+Methods:ConvertToASCII and ConvertToDecimal is to convert what the rfid reader read in into the rfid tag number. 
 */
   if (Serial1.available() > 0)
   {
