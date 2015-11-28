@@ -12,7 +12,8 @@ void loop()
 {
 
 /*
-this loop is to check on the stocks level of the clothes and to print out on a display that there is no stock.
+NAME : Nicholas
+Purpose: check on the stocks level of the clothes and to print out on a display that there is no stock.
 However, we are able to change the code so that it will send an SMS to the staff of the area to notify them.
 */
 
