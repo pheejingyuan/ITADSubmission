@@ -52,9 +52,9 @@ void loop()
 {
 
 /*
-This loop will first check whether is the LINKIT ONE board connected to the the internet.
-Before going through some algorithms to calculate the RFID tag number and the tag number will then be
-sent to the cloud for analysis.
+NAME:JING YUAN
+PURPOSE: read the rfid tag number and to upload the tag number to the cloud for analysis
+Methods:ConvertToASCII and ConvertToDecimal is to convert what the rfid reader read in into the rfid tag number. 
 */
   Serial.print("\nSearching for Wifi AP...\n");
 
