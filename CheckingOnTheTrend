@@ -1,0 +1,192 @@
+#include "rgb_lcd.h"
+#include <Wire.h>
+
+rgb_lcd lcd;
+int incomingdata = 0;
+int rfid;
+boolean started = false;
+unsigned char raw[15];
+int characters[15];
+int dataLen;
+String hexnumber;
+
+void setup()
+{
+  Serial.begin(9600);
+  Serial1.begin(9600);
+  lcd.begin(16, 2);
+}
+void loop()
+{
+/*
+this loop will actively listen for RFID tag and when a RFID tag is in range,
+it will go through an if else to check on which clothing matches the one that they are currently holding. 
+*/
+  if (Serial1.available() > 0)
+  {
+    // the incoming data is an array of 13 numbers
+    // the numbers are actually ASCII integers for ABDCDEF1234567890
+    // so we have to convert the ints to ASCII as a concatenated string
+    // thne we have to convert teh HEX string to decimal integer
+    // the decimal integer is our RFID tag number
+
+    lcd.clear();
+    incomingdata = Serial1.read();
+    characters[dataLen] = incomingdata;
+    dataLen++;
+
+    Serial.print(dataLen);
+    Serial.print(" ");
+    Serial.println(incomingdata);
+
+    delay(10);
+
+    if (dataLen > 13)
+    {
+      for (int i = 0; i < dataLen; ++i)
+      {
+        String letter = ConvertToASCII(characters[i]);
+        //Serial.print(letter);
+        if (i > 3 && i < 11)
+        {
+          hexnumber = hexnumber + letter;
+        }
+      }
+      Serial.println();
+      Serial.println(hexnumber);
+      rfid = ConvertToDecimal(hexnumber);
+
+
+      lcd.clear();
+      if (rfid == 4456156)
+      {
+        lcd.clear();
+        lcd.print("Shirt 1 matches");
+        lcd.setCursor(0, 1);
+        lcd.print("your item");
+        delay(2000);
+      }
+      else if (rfid == 5959588)
+      {
+        lcd.clear();
+        lcd.print("Shirt 2 matches");
+        lcd.setCursor(0, 1);
+        lcd.print("your item");
+        delay(2000);
+      }
+      else if (rfid == 9461767)
+      {
+        lcd.clear();
+        lcd.print("Pants 1 matches");
+        lcd.setCursor(0, 1);
+        lcd.print("your item");
+        delay(2000);
+      }
+      else if (rfid == 3413433)
+      {
+        lcd.clear();
+        lcd.print("Pants 2 matches");
+        lcd.setCursor(0, 1);
+        lcd.print("your item");
+        delay(2000);
+      }
+      rfid = 0;
+      dataLen = 0;
+      hexnumber = "";
+    }
+
+  }
+
+
+}
+
+int ConvertToDecimal(String hexnumber)
+{
+  int out;
+  char dtm[8];
+  dtm[0] = hexnumber[0];
+  dtm[1] = hexnumber[1];
+  dtm[2] = hexnumber[2];
+  dtm[3] = hexnumber[3];
+  dtm[4] = hexnumber[4];
+  dtm[5] = hexnumber[5];
+  dtm[6] = hexnumber[6];
+  dtm[7] = hexnumber[7];
+
+  sscanf( dtm, "%x", &out );
+
+  return out;
+}
+
+String ConvertToASCII(int letter)
+{
+  if (letter == 48)
+  {
+    return "0";
+  }
+  if (letter == 49)
+  {
+    return "1";
+  }
+  if (letter == 50)
+  {
+    return "2";
+  }
+  if (letter == 51)
+  {
+    return "3";
+  }
+  if (letter == 52)
+  {
+    return "4";
+  }
+  if (letter == 53)
+  {
+    return "5";
+  }
+  if (letter == 54)
+  {
+    return "6";
+  }
+  if (letter == 55)
+  {
+    return "7";
+  }
+  if (letter == 56)
+  {
+    return "8";
+  }
+  if (letter == 57)
+  {
+    return "9";
+  }
+  if (letter == 65)
+  {
+    return "A";
+  }
+  if (letter == 66)
+  {
+    return "B";
+  }
+  if (letter == 67)
+  {
+    return "C";
+  }
+  if (letter == 68)
+  {
+    return "D";
+  }
+  if (letter == 69)
+  {
+    return "E";
+  }
+  if (letter == 70)
+  {
+    return "F";
+  }
+
+  {
+    return "";
+  }
+
+}
