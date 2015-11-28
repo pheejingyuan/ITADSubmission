@@ -55,6 +55,7 @@ void loop()
 NAME:JING YUAN
 PURPOSE: read the rfid tag number and to upload the tag number to the cloud for analysis
 Methods:ConvertToASCII and ConvertToDecimal is to convert what the rfid reader read in into the rfid tag number. 
+        getrfid method is to calculate the rfid tag number after the user scanned it at the reader. 
 */
   Serial.print("\nSearching for Wifi AP...\n");
 
