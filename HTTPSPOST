@@ -1,0 +1,231 @@
+#include <Wire.h>
+#include <rgb_lcd.h>
+#include "IotHttpClient.h"
+#include "IotUtils.h"
+
+#include <LWiFi.h>
+#include <string>
+rgb_lcd lcd;
+// ********************************************
+// ****** START user defined definitions ******
+// ********************************************
+#define WIFI_SSID                       "WIFI-NAME"
+#define WIFI_PASSWORD                   "WIFI-PASSWORD"
+// ******************************************
+// ****** END user defined definitions ******
+// ******************************************
+
+//#define DELAY 60000
+
+//rgb_lcd lcd;
+
+//const int colorR = 0;
+//const int colorG = 255;
+//const int colorB = 0;
+int incomingdata = 0;
+int number;
+int numResult;
+int num;
+boolean started = false;
+unsigned char raw[15];
+int characters[15];
+int dataLen;
+String hexnumber;
+int counter;
+// ******************************************
+// ****** setup()****************************
+// ******************************************
+void setup()
+{
+  Serial.begin(9600);
+  LWiFi.begin();
+  delay(6000);
+  Serial1.begin(9600);
+  lcd.begin(16,2);
+
+}
+
+// ******************************************
+// ****** loop() ****************************
+// ******************************************
+void loop()
+{
+
+/*
+This loop will first check whether is the LINKIT ONE board connected to the the internet.
+Before going through some algorithms to calculate the RFID tag number and the tag number will then be
+sent to the cloud for analysis.
+*/
+  Serial.print("\nSearching for Wifi AP...\n");
+
+  if ( LWiFi.connectWPA(WIFI_SSID, WIFI_PASSWORD) != 1 )
+  {
+    Serial.println("Failed to Connect to Wifi.");
+  }
+  else
+  {
+    Serial.println("Connected to WiFi");
+    delay(2000);
+    Serial.print("Please scan");
+    lcd.print("Please scan");
+    delay(4000);
+    if (Serial1.available() > 0)
+    {
+      Serial.println("Serial one is available");
+      dataLen = 0;
+      hexnumber = "";
+      number = 0;
+      number = getrfid(); //method
+      lcd.clear();
+      lcd.print(number);
+      lcd.print(" Was sent");
+      lcd.setCursor(0,1);
+      lcd.print("to cloud");
+      delay(2000);
+      lcd.clear();
+      srand(vm_ust_get_current_time());
+      int device_id = 1 + (rand() % 50);
+      int temperature = (rand() % 100);
+      // Construct a JSON data string using the random data.
+      std::string json_iot_data;
+      json_iot_data += "{ \"RFID\":" + IotUtils::IntToString(number);
+      //json_iot_data += ", \"RFID\":" + IotUtils::IntToString(number);
+      json_iot_data += " }";
+      IotHttpClient     https_client;
+      int http_code = https_client.SendAzureHttpsData(json_iot_data);
+      Serial.println("Print HTTP Code:" + String(http_code));
+      exit;
+    }
+  }
+  Serial.println("Disconneting HTTP connection");
+ LWiFi.disconnect();
+  delay(6000);
+  loop();
+
+}
+
+int getrfid()
+{
+  num = 0;
+  while ( num != 14)
+  {
+
+    incomingdata = Serial1.read();
+    characters[dataLen] = incomingdata;
+    dataLen++;
+
+    Serial.print(dataLen);
+    Serial.print(" ");
+    Serial.println(incomingdata);
+    num++;
+  }
+
+  if (dataLen > 13)
+  {
+    Serial.print("Datalen is more than 13");
+    for (int i = 0; i < dataLen; ++i)
+    {
+      String letter = ConvertToASCII(characters[i]);
+      //Serial.print(letter);
+      if (i > 3 && i < 11)
+      {
+        hexnumber = hexnumber + letter;
+      }
+    }
+    Serial.println();
+    Serial.println(hexnumber);
+    numResult = ConvertToDecimal(hexnumber);
+    return numResult;
+  }
+}
+int ConvertToDecimal(String hexnumber)
+{
+  int out;
+  char dtm[8];
+  dtm[0] = hexnumber[0];
+  dtm[1] = hexnumber[1];
+  dtm[2] = hexnumber[2];
+  dtm[3] = hexnumber[3];
+  dtm[4] = hexnumber[4];
+  dtm[5] = hexnumber[5];
+  dtm[6] = hexnumber[6];
+  dtm[7] = hexnumber[7];
+
+  sscanf( dtm, "%x", &out );
+
+  return out;
+}
+
+String ConvertToASCII(int letter)
+{
+  if (letter == 48)
+  {
+    return "0";
+  }
+  if (letter == 49)
+  {
+    return "1";
+  }
+  if (letter == 50)
+  {
+    return "2";
+  }
+  if (letter == 51)
+  {
+    return "3";
+  }
+  if (letter == 52)
+  {
+    return "4";
+  }
+  if (letter == 53)
+  {
+    return "5";
+  }
+  if (letter == 54)
+  {
+    return "6";
+  }
+  if (letter == 55)
+  {
+    return "7";
+  }
+  if (letter == 56)
+  {
+    return "8";
+  }
+  if (letter == 57)
+  {
+    return "9";
+  }
+  if (letter == 65)
+  {
+    return "A";
+  }
+  if (letter == 66)
+  {
+    return "B";
+  }
+  if (letter == 67)
+  {
+    return "C";
+  }
+  if (letter == 68)
+  {
+    return "D";
+  }
+  if (letter == 69)
+  {
+    return "E";
+  }
+  if (letter == 70)
+  {
+    return "F";
+  }
+
+  {
+    return "";
+  }
+
+}
+
