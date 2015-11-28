@@ -1,0 +1,45 @@
+#include <Wire.h>
+#include <Ultrasonic.h>
+#include <rgb_lcd.h>
+
+rgb_lcd lcd;
+Ultrasonic ultrasonic(3);
+void setup()
+{
+  lcd.begin(16, 2);
+}
+void loop()
+{
+
+/*
+this loop is to check on the stocks level of the clothes and to print out on a display that there is no stock.
+However, we are able to change the code so that it will send an SMS to the staff of the area to notify them.
+*/
+
+        int RangeInCentimeters;
+        RangeInCentimeters = ultrasonic.MeasureInCentimeters();
+        
+        lcd.clear();
+       lcd.print(RangeInCentimeters);
+       
+       if(RangeInCentimeters >11)
+       {
+         lcd.clear();
+         lcd.setCursor(0,0);
+         lcd.print("Stock is");
+         lcd.setCursor(0,1);
+         lcd.print("running out");
+         delay(2000);
+         lcd.clear();
+        }
+        else
+        {
+          lcd.clear();
+          lcd.setCursor(0,0);
+          lcd.print("There is stock");
+          delay(2000);
+          lcd.clear();
+        }
+        delay(2000);
+        
+}
